@@ -1,0 +1,571 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ?) ;; \
+      *\\[\ \	]*) \
+  { \
+  }; \
+'
+	  *) \
+abs_builddir = /home/fox/src/ezs-1.4.0/test
+abs_srcdir = /home/fox/src/ezs-1.4.0/test
+abs_top_builddir = /home/fox/src/ezs-1.4.0
+abs_top_srcdir = /home/fox/src/ezs-1.4.0
+ac_ct_AR = ar
+ac_ct_CC = gcc
+ac_ct_DUMPBIN = 
+ACLOCAL = aclocal-1.14
+	$(ACLOCAL_M4)
+$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+all: all-am
+all-am: Makefile $(PROGRAMS)
+$(am__aclocal_m4_deps):
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__can_run_installinfo = \
+am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
+	  && $(am__cd) $(top_srcdir) \
+	$(am__cd) $(top_srcdir) && \
+	$(AM_CFLAGS) $(CFLAGS)
+am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
+am_crypt1_OBJECTS = crypt1.$(OBJEXT)
+AM_DEFAULT_VERBOSITY = 1
+	$(am__define_uniq_tagged_files); \
+	$(am__define_uniq_tagged_files); \
+am__define_uniq_tagged_files = \
+	$(am__define_uniq_tagged_files); mkid -fID $$unique
+am__depfiles_maybe = depfiles
+am__include = include
+am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_LDFLAGS = -L../.libs -L/usr/local/lib -lezs -lssl -lcrypto -lpthread -ldl
+am__leading_dot = .
+am__make_dryrun = (target_option=n; $(am__make_running_with_option))
+am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
+am__make_running_with_option = \
+am__mv = mv -f
+am__quote = 
+am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
+AMTAR = $${TAR-tar}
+am__tar = $${TAR-tar} chof - "$$tardir"
+am__uniquify_input = $(AWK) '\
+am__untar = $${TAR-tar} xf -
+am__v_at_0 = @
+am__v_at_1 = 
+	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
+AM_V_at = $(am__v_at_$(V))
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+am__v_CC_ = $(am__v_CC_$(AM_DEFAULT_VERBOSITY))
+AM_V_CC = $(am__v_CC_$(V))
+	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
+am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
+AM_V_CCLD = $(am__v_CCLD_$(V))
+	$(AM_V_CCLD)$(LINK) $(crypt1_OBJECTS) $(crypt1_LDADD) $(LIBS)
+	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+#	$(AM_V_CC_no)$(COMPILE) -c -o $@ $<
+#	$(AM_V_CC_no)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+#	$(AM_V_CC_no)$(LTCOMPILE) -c -o $@ $<
+#	$(AM_V_CC)source='$<' object='$@' libtool=no \
+#	$(AM_V_CC)source='$<' object='$@' libtool=no \
+#	$(AM_V_CC)source='$<' object='$@' libtool=yes \
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
+AM_V_GEN = $(am__v_GEN_$(V))
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+AM_V_lt = $(am__v_lt_$(V))
+am__v_P_0 = false
+am__v_P_1 = :
+am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
+AM_V_P = $(am__v_P_$(V))
+# and print each of them once, without duplicates.  Input order is
+AR = ar
+AUTOCONF = autoconf
+AUTOHEADER = autoheader
+AUTOMAKE = automake-1.14
+	  $(AUTOMAKE) --foreign test/Makefile
+AWK = mawk
+  BEGIN { nonempty = 0; } \
+bindir = ${exec_prefix}/bin
+        bs=\\; \
+build_alias = 
+build_cpu = x86_64
+builddir = .
+build_os = linux-gnu
+build_triplet = x86_64-unknown-linux-gnu
+build_vendor = unknown
+build = x86_64-unknown-linux-gnu
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+	  case '$(am__configure_deps)' in \
+  case $$AM_UPDATE_INFO_DIR in \
+	case $$dist_files in \
+    case $$flg in \
+    case $$flg in \
+	@case '$?' in \
+    case $$MAKEFLAGS in \
+	case "$(srcdir)" in \
+  case $${target_option-} in \
+CCDEPMODE = depmode=gcc3
+CC = gcc
+CCLD = $(CC)
+	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
+	    cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh;; \
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
+CFLAGS = -g -O2
+check-am: all-am
+check: check-am
+clean-am: clean-generic clean-libtool clean-noinstPROGRAMS \
+clean: clean-am
+clean-generic:
+clean-libtool:
+	clean-libtool clean-noinstPROGRAMS cscopelist-am ctags \
+clean-noinstPROGRAMS:
+.c.lo:
+.c.o:
+.c.obj:
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_VPATH_FILES =
+CONFIG_HEADER = $(top_builddir)/config.h
+	  *config.status*) \
+      *=*|--*) continue;; \
+# Copyright (C) 1994-2013 Free Software Foundation, Inc.
+	    cp -fpR $$d/$$file "$(distdir)$$dir" || exit 1; \
+	      cp -fpR $(srcdir)/$$file "$(distdir)$$dir" || exit 1; \
+	    || cp -p $$d/$$file "$(distdir)/$$file" \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CPPFLAGS =  -IHAVE_LIBSSL_VERSION
+CPP = gcc -E
+crypt1$(EXEEXT): $(crypt1_OBJECTS) $(crypt1_DEPENDENCIES) $(EXTRA_crypt1_DEPENDENCIES) 
+crypt1_LDADD = $(LDADD)
+crypt1_OBJECTS = $(am_crypt1_OBJECTS)
+crypt1_SOURCES = crypt1.c
+cscopelist-am: $(am__tagged_files)
+cscopelist: cscopelist-am
+	ctags-am distclean distclean-compile distclean-generic \
+ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
+CTAGS = ctags
+CTAGS: ctags
+ctags: ctags-am
+	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
+CYGPATH_W = echo
+datadir = ${datarootdir}
+datarootdir = ${prefix}/share
+      -[dEDm]) skip_next=yes;; \
+DEFAULT_INCLUDES = -I. -I$(top_builddir)
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+DEFS = -DHAVE_CONFIG_H
+	    *$$dep*) \
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+DEPDIR = .deps
+	    dir=`echo "/$$file" | sed -e 's,/[^/]*$$,,'`; \
+distclean-am: clean-am distclean-compile distclean-generic \
+distclean-compile:
+distclean: distclean-am
+distclean-generic:
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	distclean-tags
+distclean-tags:
+DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
+distdir: $(DISTFILES)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+	  dist_files=`for file in $$list; do echo $$file; done | \
+DIST_SOURCES = $(crypt1_SOURCES)
+DLLTOOL = false
+docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
+  done; \
+	done
+	done; \
+  done | $(am__uniquify_input)`
+	done >> $(top_builddir)/cscope.files
+DSYMUTIL = 
+DUMPBIN = 
+dvi-am:
+dvidir = ${docdir}
+dvi: dvi-am
+      *) echo "am__make_running_with_option: internal error: invalid" \
+ECHO_C = 
+	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign test/Makefile'; \
+	@echo "it deletes files that may require special tools to rebuild."
+ECHO_N = -n
+	echo " rm -f" $$list; \
+	echo " rm -f" $$list; \
+	    echo "$$sdir/$$i"; \
+	    echo "$(subdir)/$$i"; \
+ECHO_T = 
+	@echo "This command is intended for maintainers to use"
+EGREP = /bin/grep -E
+# e.g., the same source file might be shared among _SOURCES variables
+  else \
+	  else \
+	  else \
+	  else \
+	else \
+  END { if (nonempty) { for (i in items) print i; }; } \
+  esac
+    esac; \
+    esac; \
+    esac; \
+  esac; \
+	  esac; \
+	esac;
+	esac; \
+	esac; \
+	      -e "s|^$$topsrcdirstrip/|$(top_builddir)/|;t"`; \
+ETAGS = etags
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+exec_prefix = ${prefix}
+EXEEXT = 
+         exit 1;; \
+	    || exit 1; \
+	      exit 1;; \
+EXTRA_DIST = README 
+FGREP = /bin/grep -F
+  fi; \
+	fi
+	fi
+	    fi; \
+	    fi; \
+	  fi; \
+	  fi; \
+	  fi; \
+	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
+	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
+    flg=`printf '%s\n' "$$flg" | sed "s/$$1.*$$//"`; \
+	@for dep in $?; do \
+# for different programs/libraries.
+	for file in $$dist_files; do \
+  for flg in $$sane_makeflags; do \
+	for i in $$list; do \
+# gives unlimited permission to copy and/or distribute it,
+GREP = /bin/grep
+GTAGS:
+	  && gtags -i $(GTAGS_ARGS) "$$here"
+  has_opt=no; \
+	here=`$(am__cd) $(top_builddir) && pwd` \
+	here=`pwd`; \
+host_alias = 
+host_cpu = x86_64
+host_os = linux-gnu
+host_triplet = x86_64-unknown-linux-gnu
+host_vendor = unknown
+host = x86_64-unknown-linux-gnu
+html-am:
+	html-am info info-am install install-am install-data \
+htmldir = ${docdir}
+html: html-am
+ID: $(am__tagged_files)
+  if $(am__is_gnu_make); then \
+	  if test -d $$d/$$file; then \
+	    if test -d "$(distdir)/$$file"; then \
+	    if test -d $(srcdir)/$$file && test $$d != $(srcdir); then \
+	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
+	  if test -f "$$i"; then \
+    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	        && { if test -f $@; then exit 0; else break; fi; }; \
+	  if test $$# -gt 0; then \
+	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
+	if test -z '$(STRIP)'; then \
+include ./$(DEPDIR)/crypt1.Po
+includedir = ${prefix}/include
+INCLUDES = -I..
+info-am:
+infodir = ${datarootdir}/info
+info: info-am
+	      install; \
+install-am: all-am
+installcheck-am:
+	installcheck-am installdirs maintainer-clean \
+installcheck: installcheck-am
+install-data-am:
+	install-data-am install-dvi install-dvi-am install-exec \
+install-data: install-data-am
+INSTALL_DATA = ${INSTALL} -m 644
+installdirs:
+install-dvi-am:
+install-dvi: install-dvi-am
+install-exec-am:
+	install-exec-am install-html install-html-am install-info \
+install-exec: install-exec-am
+INSTALL_HEADER = $(INSTALL_DATA)
+install-html-am:
+install-html: install-html-am
+install-info-am:
+	install-info-am install-man install-pdf install-pdf-am \
+install-info: install-info-am
+    *) (install-info --version) >/dev/null 2>&1;; \
+install: install-am
+install-man:
+install-pdf-am:
+install-pdf: install-pdf-am
+	    "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'" install; \
+INSTALL_PROGRAM = ${INSTALL}
+install-ps-am:
+install-ps: install-ps-am
+	install-ps install-ps-am install-strip installcheck \
+INSTALL_SCRIPT = ${INSTALL}
+install_sh_DATA = $(install_sh) -c -m 644
+install_sh_PROGRAM = $(install_sh) -c
+	    install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
+	    install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
+install_sh_SCRIPT = $(install_sh) -c
+install_sh = ${SHELL} /home/fox/src/ezs-1.4.0/install-sh
+install-strip:
+INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
+INSTALL = /usr/bin/install -c
+      -*I?*) strip_trailopt 'I';; \
+        -*I) strip_trailopt 'I'; skip_next=yes;; \
+  { items[$$0] = 1; nonempty = 1; } \
+      -[JT]) skip_next=yes;; \
+LDFLAGS = 
+LD = /usr/bin/ld -m elf_x86_64
+libdir = ${exec_prefix}/lib
+libexecdir = ${exec_prefix}/libexec
+LIBOBJS = 
+LIBS = 
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+LIPO = 
+  list='$(am__tagged_files)'; \
+	list='$(am__tagged_files)'; \
+	list='$(DISTFILES)'; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+LN_S = ln -s
+localedir = ${datarootdir}/locale
+localstatedir = ${prefix}/var
+      -*l?*) strip_trailopt 'l';; \
+        -*l) strip_trailopt 'l'; skip_next=yes;; \
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+LTLIBOBJS = 
+maintainer-clean-am: distclean-am maintainer-clean-generic
+maintainer-clean-generic:
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+maintainer-clean: maintainer-clean-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+# Makefile.in generated by automake 1.14.1 from Makefile.am.
+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+MAKEINFO = makeinfo
+.MAKE: install-am install-strip
+# Make sure the list of sources is unique.  This is necessary because,
+mandir = ${datarootdir}/man
+MANIFEST_TOOL = :
+MKDIR_P = /bin/mkdir -p
+	  */*) $(MKDIR_P) `echo "$$dist_files" | \
+mkdir_p = $(MKDIR_P)
+mkinstalldirs = $(install_sh) -d
+	mostlyclean-am
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+mostlyclean-compile:
+mostlyclean-generic:
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	mostlyclean-libtool
+mostlyclean-libtool:
+mostlyclean: mostlyclean-am
+NMEDIT = 
+NM = /usr/bin/nm -B
+    n|no|NO) false;; \
+.NOEXPORT:
+noinst_PROGRAMS = crypt1$(EXEEXT)
+NORMAL_INSTALL = :
+NORMAL_UNINSTALL = :
+# *not* preserved.
+OBJDUMP = objdump
+OBJEXT = o
+oldincludedir = /usr/include
+      -*O?*) strip_trailopt 'O';; \
+        -*O) strip_trailopt 'O'; skip_next=yes;; \
+# Otherwise a system limit (for SysV at least) may be exceeded.
+OTOOL = 
+OTOOL64 = 
+PACKAGE_BUGREPORT = 
+PACKAGE = ezs
+PACKAGE_NAME = ezs
+PACKAGE_STRING = ezs 1.4.1
+PACKAGE_TARNAME = ezs
+PACKAGE_URL = 
+PACKAGE_VERSION = 1.4.1
+# PARTICULAR PURPOSE.
+PATH_SEPARATOR = :
+pdf-am:
+pdfdir = ${docdir}
+pdf: pdf-am
+.PHONY: CTAGS GTAGS TAGS all all-am check check-am clean clean-generic \
+pkgdatadir = $(datadir)/ezs
+pkgincludedir = $(includedir)/ezs
+pkglibdir = $(libdir)/ezs
+pkglibexecdir = $(libexecdir)/ezs
+POST_INSTALL = :
+POST_UNINSTALL = :
+.PRECIOUS: Makefile
+prefix = /usr/local
+PRE_INSTALL = :
+PRE_UNINSTALL = :
+PROGRAMS = $(noinst_PROGRAMS)
+program_transform_name = s,x,x,
+ps-am:
+psdir = ${docdir}
+ps: ps-am
+RANLIB = ranlib
+# Read a list of newline-separated strings from the standard input,
+	@rm -f crypt1$(EXEEXT)
+	rm -f $$list
+	rm -f $$list || exit $$?; \
+	-rm -f *.lo
+	-rm -f Makefile
+	-rm -f Makefile
+	-rm -f *.$(OBJEXT)
+	-rm -f *.tab.c
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR)
+	-rm -rf .libs _libs
+  sane_makeflags=$$MAKEFLAGS; \
+    sane_makeflags=$$MFLAGS; \
+        sane_makeflags=`printf '%s\n' "$$MAKEFLAGS" \
+sbindir = ${exec_prefix}/sbin
+	  [\\/]* | ?:[\\/]*) sdir="$(srcdir)" ;; \
+	  *) sdir=$(subdir)/$(srcdir) ;; \
+SED = /bin/sed
+			   sed '/\//!d;s|^|$(distdir)/|;s,/[^/]*$$,,' | \
+	  sed -e "s|^$$srcdirstrip/||;t" \
+          | sed "s/$$bs$$bs[$$bs $$bs	]*//g"`;; \
+SET_MAKE = 
+	set x; \
+sharedstatedir = ${prefix}/com
+SHELL = /bin/bash
+	shift; \
+  skip_next=no; \
+			   sort -u` ;; \
+SOURCES = $(crypt1_SOURCES)
+srcdir = .
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+STRIP = strip
+  strip_trailopt () \
+subdir = test
+.SUFFIXES:
+.SUFFIXES: .c .lo .o .obj
+sysconfdir = ${prefix}/etc
+tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
+TAGS: tags
+tags: tags-am
+	tags tags-am uninstall uninstall-am
+target_alias = 
+      *$$target_option*) has_opt=yes; break;; \
+              "target option '$${target_option-}' specified" >&2; \
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+	    test -f "$(distdir)/$$file" \
+  test $$has_opt = yes
+# test/Makefile.  Generated from Makefile.in by configure.
+	test -n "$(EXEEXT)" || exit 0; \
+	  test -n "$$unique" || unique=$$empty_fix; \
+    test $$skip_next = yes && { skip_next=no; continue; }; \
+	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	test -z "$(CTAGS_ARGS)$$unique" \
+# these seem to work on my linux and aix
+# This Makefile.in is free software; the Free Software Foundation
+# This program is distributed in the hope that it will be useful,
+top_builddir = ..
+$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+top_build_prefix = ../
+top_srcdir = ..
+$(top_srcdir)/configure:  $(am__configure_deps)
+	$(top_srcdir)/depcomp
+	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+transform = $(program_transform_name)
+uninstall-am:
+uninstall: uninstall-am
+	      "$$@" $$unique; \
+	      $$unique; \
+	     $$unique
+  unique=`for i in $$list; do \
+VERSION = 1.4.1
+# with or without modifications, as long as this notice is preserved.

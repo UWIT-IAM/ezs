@@ -1,0 +1,19 @@
+These are some sample programs for the ezs library
+
+client1:  client using ezs connect
+
+client2:  client using manual connect
+          optionally uses non-blocking IO 
+          will copy binary files
+
+client3:  memory leak test
+
+server1:  server using ezs listen and accept
+
+server2:  server using manual listen and accept
+          optionally uses non-blocking IO 
+          will copy binary files
+
+server3:  memory leak test
+
+crypt1:   encryption, decryption, and mac program

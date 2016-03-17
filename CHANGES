@@ -1,0 +1,3 @@
+1.4.0:  optionally deny use of SSLv3
+1.4.2:  Allow multiple certs in ca files
+

@@ -1,0 +1,12 @@
+mycert cn=localhost
+.. read, ezs error 10 Read end of file
+.. read, ezs error 10 Read end of file
+Accepting connections, port '98765'.
+[1] recv 26 bytes: Hello, world. First time.
+
+[1] recv 15 bytes: Goodbye world.
+
+[2] recv 27 bytes: Hello, world. Second time.
+
+[2] recv 5 bytes: exit
+

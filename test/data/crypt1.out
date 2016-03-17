@@ -1,0 +1,7 @@
+icrypt: r=1, l=16425, bs=16
+ecrypt: r=16432, l=16432
+dcrypt: r=16425, l=16425
+mac (in=16425) = (out=20) 298cdca30bc6e8b64f116f6e87ce954dae4d63b8
+Hash of "crypt1.out" is: KYzcowvG6LZPEW9uh86VTa5NY7g=
+
+mac (20) 298cdca30bc6e8b64f116f6e87ce954dae4d63b8

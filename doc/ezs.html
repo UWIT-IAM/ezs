@@ -1,0 +1,2622 @@
+<!-- ######################################################################
+ * Copyright (c) 2004-2007 The University of Washington
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ========================================================================
+ -->
+
+
+<html>
+<head>
+<title>  EZ-SSL
+</title>
+<link rel=stylesheet type=text/css href=http://staff.washington.edu/fox/lib/fox.css>
+</head>
+<body>
+
+
+<p>
+<h1> EZ-SSL library
+
+</h1>
+
+<div class=wide-right>
+
+<div class="proc-summary">
+<table cellpadding=3 border=0>
+<tr><th align=left valign=top>Summary:</th><td align=left>
+
+Provides an easy-to-use, SSL protected connection library.
+
+</td></tr>
+<tr><th align=left valign=top>Version:</th><td align=left> 1.4.1
+
+</td></tr>
+<tr><th align=left valign=top>Download:</th><td align=left> <a href="ezs-1.4.1.tar.gz">ezs-1.4.1.tar.gz</a>
+</td></tr>
+</table>
+</div>
+
+
+ 
+
+<ul>
+  <li>  <a href="http://openssl.org/">Openssl</a> is the de facto
+  open source standard for secure network communications, but can
+  be difficult to use properly.  This library removes some of that
+  complexity, while providing the standard functions needed
+  by clients and servers: connect, read, write.
+
+<p>
+  <li> Although not needed for secure communications, convenience
+      routines are provided to encrypt and decrypt data.
+
+<p>
+  <li>
+   The library replaces an older, custom crypto connection library
+   used at UW (lsc), and is similar in function.
+
+</ul>
+
+
+<p>
+
+
+
+
+<p>
+
+
+<div class="indent">
+
+<div class="menu">
+&nbsp; Contents 
+<ol>
+<li><a href="#UNIXnotes"> UNIX notes
+</a>
+<li><a href="#Windowsnotes"> Windows notes
+</a>
+<li><a href="#LibraryAPI"> Library API
+</a>
+<ol>
+<li><a href="#Handlingerrors"> Handling errors
+</a>
+<li><a href="#Initializingthelibrary"> Initializing the library
+</a>
+<li><a href="#Authenticatingwithcertificates"> Authenticating with certificates
+</a>
+<li><a href="#Cachingsessions"> Caching sessions
+</a>
+<li><a href="#Handlingconnections"> Handling connections
+</a>
+<li><a href="#Readingandwriting"> Reading and writing
+</a>
+<li><a href="#Encryptingdata"> Encrypting data
+</a>
+<li><a href="#Versioninformation"> Version information
+</a>
+</ol>
+<li><a href="#License"> License
+</a>
+<li><a href="#Examples"> Examples
+</a>
+
+</ol>
+&nbsp;
+</div>
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="UNIXnotes"> UNIX notes</div><p>
+
+<p>
+You should be able to install with 
+<p class=indent>
+<code>
+$ ./configure <br>
+$ make <br>
+$ make install <br>
+</code>
+<p>
+
+Programs using the ezs api must include
+<p class=indent>
+<code>
+  #include "ezs.h"
+</code>
+</p>
+and link with at least these libraries (On linux at least you must specify the pthread library)
+<p class=indent>
+<code>
+  -lezs -lssl -lcrypto -lpthread
+</code>
+<p>
+I have had success on AIX with <tt>CC=cc_r</tt>.
+<p>
+
+
+<div class="proc-section-bar"><a name="Windowsnotes"> Windows notes</div><p>
+<p>
+The windows distribution contains libraries compiled
+for threaded debug and non-debug applications (MD, MDd).
+It is built for version 0.9.8b of 
+<a href=http://www.openssl.org/related/binaries.html>OpenSSL for Windows</a>.
+<p>
+Programs using the windows api must include
+<p class=indent>
+<code>
+  #include "ezs.h"
+</code>
+</p>
+and link with one the correct library: <tt>ezsMD.lib</tt> or <tt>ezsMDd.lib</tt>.
+<p>
+
+
+
+<div class="proc-section-bar"><a name="LibraryAPI"> Library API</div><p>
+<p>
+The library provides procedure APIs that allow
+clients and servers to connect, authenticate, and communicate.
+
+<p>
+
+<div class="proc-section-bar"><a name="Handlingerrors"> Handling errors</div><p>
+
+When a procedure returns an error indication,
+you may retrieve the error code or error code and a text 
+description.   Individual error codes are maintained for 
+each connection (<i>EZS</i>).  A global error code is
+maintained for 'unconnected' functions.
+<p>
+Local system errors are indicated by a negative error code:
+the negative of the system's <i>errno</i>.
+<p>
+If all else fails, setting the external variable
+<tt>ezs_debug</tt> to one causes the library to print
+debug output to <i>stderr</i>.
+
+<p>
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_errno">&nbsp;ezs_errno</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Get the last error code 
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_errno(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> the error code
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> If <i>E</i> is NULL the global error is returned.
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_geterror">&nbsp;ezs_geterror</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Get the last error code and message
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;*ezs_geterror(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char**</tt> <var>txt</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>txt</var>:</td><td>Pointer to a character pointer to receive the error text.</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> the error code
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> If <i>E</i> is NULL the global error is returned.
+
+       <li> <i>txt</i> may be NULL. In which case no text is returned.
+
+       <li> Caller is responsible for <i>free</i>ing the error text.
+
+       <li> The error text includes a description of any SSL errors.
+
+       <li> SSL errors are cleared as they are retrieved, so this 
+  call may be made only once per error.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="Initializingthelibrary"> Initializing the library</div><p>
+<p>
+SSL requires initialization for its thread mutexes
+and its random number seed.   You should provide
+a read/write file for the random seed.  You can
+rewrite this file before exiting to update
+its 'randomness'.
+<p>
+Usual sequence is
+<p class=indent>
+<code>
+ezs_init(<i>name</i>); <br>
+ezs_load_rand_file(<i>filename</i>); <br>
+</code>
+<p>
+at the start of your program, and
+<p class=indent>
+<code>
+ezs_save_rand_file(<i>filename</i>);
+</code>
+<p>
+at the end.
+
+<p>
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_init">&nbsp;ezs_init</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Initializes the openssl and ezs libraries.
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;*ezs_init(<tt>char*</tt> <var>name</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>name</var>:</td><td>session name, may be NULL</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 (always success)
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> This must be called prior to any thread
+  or openssl calls by the program.
+
+
+       <li> The first call to ezs_new will invoke ezs_init with a NULL name
+    if the caller has not already called <i>ezs_init</i>.
+
+
+       <li> Servers can use <i>name</i> to identify SSL sessions.
+      A NULL value deactivates sessions.
+
+       <li> The argument is ignored for clients.
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_load_rand_file">&nbsp;ezs_load_rand_file</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Adds data from the file to SSL's 'randomness'.
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;*ezs_load_rand_file(<tt>char*</tt> <var>filename</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>filename</var>:</td><td>read/write file of random data</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> This should be called prior to any SSL operation.
+
+       <li> You may call this more than once, with different filenames.
+
+       <li> This is implemented as a macro
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_save_rand_file">&nbsp;ezs_save_rand_file</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Writes random data to the file.
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;*ezs_save_rand_file(<tt>char*</tt> <var>filename</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>filename</var>:</td><td>read/write file of random data</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> This should be called just before your program exits
+      to update the random seed file, but it can be called any time.
+
+       <li> This is implemented as a macro
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_new">&nbsp;ezs_new</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Allocates a new ezs struct, which will identify
+ a particular connection.
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>EZS</tt>&nbsp;*ezs_new()</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> Pointer to an EZS structure
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Initializes the library if <tt>ezs_init</tt> has not been called.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_free">&nbsp;ezs_free</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Frees an ezs struct.
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;*ezs_free(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<div class="proc-section-bar"><a name="Authenticatingwithcertificates"> Authenticating with certificates</div><p>
+
+There are several credentials involved in a secure ezs connection:
+
+<div class="proc-display"> 
+
+The authenticating certificate and key consists of a single certificate
+and key pair that you are using to authenticate to your peer on the
+connection.  Your certificate must have been signed by a CA who is trusted 
+by the peer.  Use <a href="#ezs_add_cert">ezs_add_cert</a> to
+add certificates and keys to the list of certificates 
+you can use to authenticate to a peer.
+<p>
+Generally if a key file is not specified the key is assumed to
+be in the same file as the certificate.
+</div>
+
+<div class="proc-display"> 
+
+A CA certificate is the public certificate 
+of a Certificate Authority (CA) whose signatures you will accept. 
+Use <a href="#ezs_add_ca">ezs_add_ca</a>
+to add certificates to the list of acceptable CAs.
+</div>
+
+
+<div class="proc-display">
+
+A Certificate Revocation List (CRL) identifies certificates
+that have been revoked by their CA and are no longer valid.
+Use <a href="#ezs_add_ca">ezs_add_ca</a>
+or <a href="#ezs_add_crl">ezs_add_crl</a>
+to add to your list of CRLs.
+</div>
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_add_ca">&nbsp;ezs_add_ca</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Add a CA to your list of acceptable CAs.
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_add_ca(<tt>char*</tt> <var>ca_file</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>ca_file</var>:</td><td> Contains CA certificate to add</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error
+
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> invalid CA file</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li>  The certificate 
+  will be added to the list of acceptable signers 
+  of peer certificates.
+
+       <li> Must be PEM format
+
+       <li> If the file also contains a CRL entry it will 
+   automatically be added to the CRL list.
+
+       <li> If the file contains multiple certificates only the
+   first is loaded.
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_add_crl">&nbsp;ezs_add_crl</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Add a CRL to your list of CRLs. 
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_add_crl(<tt>char*</tt> <var>crl_file</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>crl_file</var>:</td><td> Contains the CRL to add</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error 
+
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> invalid CRL file</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> The CRL will be added to the list of CRLs used to verify certificates.
+
+       <li> Must be PEM format
+
+       <li> You can use <tt>ezs_add_crl</tt> at any time
+   to load a new CRL or to refresh an existing CRL.
+   Changes will take effect on the next connect or accept.
+   Existing connections will be unaffected.
+
+       <li> If the file contains multiple CRLs only the
+   first is loaded.
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_add_cert">&nbsp;ezs_add_cert</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Adds a certificate to the list of available 
+      certificates for authentication to peers.
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_add_cert(<tt>char*</tt> <var>crt</var>,&nbsp;<tt>char*</tt> <var>key</var>,&nbsp;<tt>char**</tt> <var>cn</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>crt</var>:</td><td> Certificate file (PEM)</td></tr>
+       <tr><td><var>key</var>:</td><td> Key file (PEM)</td></tr>
+       <tr><td><var>cn</var>:</td><td> If specified, returns the cert's cn.</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error 
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> invalid cert or key</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> If <i>key</i> is NULL the certificate's key  will be looked for 
+       in the crt file.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_set_verify">&nbsp;ezs_set_verify</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Sets the option to verify the server hostname vs. common name.
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;ezs_set_verify(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Normally a client or server may choose one of many 
+  certificates for any given connection.  This option
+  requires that the CN of the certificate match the hostname. 
+
+       <li> This is implemented as a macro
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_get_peer_cn">&nbsp;ezs_get_peer_cn</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Returns the CN of the connected peer's certificate
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>char</tt>&nbsp;ezs_get_peer_cn(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> The returned value is a pointer into the <i>EZS</i>
+      structure.  DO NOT free it. 
+
+       <li> This is implemented as a macro
+
+
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="Cachingsessions"> Caching sessions</div><p>
+
+SSL allows the connecting peer to record a session identifier, essentually
+the private key used for encryption of data, and use that
+saved identifier to facilitate subsequent sessions.  This bypasses
+the comparitively long public-key negotiation typical 
+of SSL.  Session identifier lifetime is normally five minutes. 
+
+<div class="proc-display">
+
+Server sessions are activated by a non-NULL session name
+given to <i>ezs_init</i> or by the <i>ezs_set_session_name</i> function.
+A NULL session name disables sessions for subsequent accpeted connections.
+<p>
+Sessions on the server each consume about 12K bytes of memory, and
+can accumulate rapidly on busy servers.  The expire after about 
+five minutes and are automatically purged.
+</div>
+
+
+<div class="proc-display">
+
+Clients can save and reuse a session -- thereby saving
+negotiating overhead on subsequent connections. 
+</div>
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_set_session_name">&nbsp;ezs_set_session_name</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Set the server's session name or deactivate sessions
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;ezs_set_session_name(<tt>char*</tt> <var>name</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>name</var>:</td><td> name to use for subsequent accepted connections</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> If <i>name</i> is NULL sessions are deactivated.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_get_session">&nbsp;ezs_get_session</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Retrieve the session identifier associated with the
+         current connection
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>char</tt>&nbsp;*ezs_get_session(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> A session identifier
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_NO_CONNECTION</var>:</td><td> No session exists</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> The session identifier is a null-terminated character string.
+
+       <li> <tt>ezs_get_session</tt> must be called after the 
+    connection is opened.
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_set_session">&nbsp;ezs_set_session</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Specifies a session identifier to be used for the next connection. 
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;*ezs_set_session(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char*</tt> <var>session</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>session</var>:</td><td> A session identifier.</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error 
+
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> invalid session</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> The session identifier is a null-terminated character string.
+
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="Handlingconnections"> Handling connections</div><p>
+
+Connections are not symmetric.  Servers generally wait
+for connection requests from clients.  
+
+The library provides connection tools to perform both
+the IP connect, or accept, and the SSL negotiation
+or just the negotiation step.
+
+
+<div class="proc-display">
+
+If you want to use non-blocking IO, set the non-blocking
+flag and timeout parameter prior to connecting to a server
+or accepting client connections.  In non-blocking mode
+any operation may return an <tt>EZS_ERR_WOULDBLOCK</tt> error.
+The blocked operation may be retried.
+</div>
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_use_blocking_io">&nbsp;ezs_use_blocking_io</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td>  Sets blocking IO for this connection
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;*ezs_use_blocking_io(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> This is the default mode
+
+       <li> This is implemented as a macro
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_use_nonblocking_io">&nbsp;ezs_use_nonblocking_io</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td>  Sets non-blocking IO for this connection
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;*ezs_use_nonblocking_io(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> This is implemented as a macro
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_set_timeout">&nbsp;ezs_set_timeout</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td>  Sets semi-blocking timeout for this connection
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;*ezs_set_timeout(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>int</tt> <var>timeout</var>)&nbsp;</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>timeout</var>:</td><td> seconds to block before reporting a wouldblock error.</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> This is implemented as a macro
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_allow_v2">&nbsp;ezs_allow_v2</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Allow connections using SSLv2 protocol
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;ezs_allow_v2(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> By default the library does not allow SSLv2.
+       <li> This is implemented as a macro
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_allow_v3">&nbsp;ezs_allow_v3</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Allow connections using v3 protocol
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;ezs_allow_v3(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> By default the library allows SSLv3.
+       <li> This is implemented as a macro
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_deny_v2">&nbsp;ezs_deny_v2</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Deny use of the SSLv2 protocol
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;ezs_deny_v2(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> By default the library does not allow SSLv2.
+       <li> This is implemented as a macro
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_deny_v3">&nbsp;ezs_deny_v3</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Deny use of the SSLv3 protocol
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;ezs_deny_v3(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> By default the library allows SSLv3.
+       <li> This is implemented as a macro
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_connect">&nbsp;ezs_connect</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Client connect and authenticate to a server
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_connect(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char*</tt> <var>service</var>,&nbsp;<tt>char*</tt> <var>cn</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>service</var>:</td><td> The service address: (<i>host:port<i>).</td></tr>
+       <tr><td><var>cn</var>:</td><td> CN of the certificate to use for authentication</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error 
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_NOCRT</var>:</td><td> cert (cn) not loaded</td></tr>
+       <tr><td><var>EZS_ERR_BADCRT</var>:</td><td> cert invalid</td></tr>
+       <tr><td><var>EZS_ERR_BADKEY</var>:</td><td> key invalid</td></tr>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> connection failure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> The 'cn' must have been previously loaded with  
+     <a href="#ezs_add_cert">ezs_add_cert</a>.
+
+       <li> On success the connection will be open and verified.
+
+       <li> You can find the peer's cn with <a href="#ezs_get_peer_cn">ezs_get_peer_cn</a>.
+
+       <li> If you choose not to retry a WOULDBLOCK error you must 
+   call <tt>ezs_disconnect</tt> to close the partially open connection.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_connect_fd">&nbsp;ezs_connect_fd</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Client authenticate to a server over already connected socket
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_connect_fd(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>int</tt> <var>fd</var>,&nbsp;<tt>char*</tt> <var>cn</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>fd</var>:</td><td> The connected file descriptor</td></tr>
+       <tr><td><var>cn</var>:</td><td> CN of the certificate to use for authentication</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error 
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_NOCRT</var>:</td><td> cert (cn) not loaded</td></tr>
+       <tr><td><var>EZS_ERR_BADCRT</var>:</td><td> cert invalid</td></tr>
+       <tr><td><var>EZS_ERR_BADKEY</var>:</td><td> key invalid</td></tr>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> connection failure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> You can find the peer's cn with <a href="#ezs_get_peer_cn">ezs_get_peer_cn</a>.
+
+       <li> If you choose not to retry a WOULDBLOCK error you must 
+   call <tt>ezs_disconnect</tt> to close the partially open connection.
+
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_listen">&nbsp;ezs_listen</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td>  Listen on a port for connection requests.
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_listen(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char*</tt> <var>port</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>port</var>:</td><td> Port to listen on</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error 
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> listen failure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Note that the port is a character string
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_accept">&nbsp;ezs_accept</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Server accept connection and verify client
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>EZS</tt>&nbsp;*ezs_accept(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char*</tt> <var>cn</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>cn</var>:</td><td> CN of the certificate to use for authentication</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> An EZS structure, NULL = error
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_NOCRT</var>:</td><td> cert (cn) not loaded</td></tr>
+       <tr><td><var>EZS_ERR_BADCRT</var>:</td><td> cert invalid</td></tr>
+       <tr><td><var>EZS_ERR_BADKEY</var>:</td><td> key invalid</td></tr>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> accept failure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> On success the connection will be open and verified.
+
+       <li> You can find the peer's cn with <a href="#ezs_get_peer_cn">ezs_get_peer_cn</a>.
+
+       <li> If you choose not to retry a WOULDBLOCK error you must 
+   call <tt>ezs_disconnect</tt> to close the partially open connection.
+
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_accept_fd">&nbsp;ezs_accept_fd</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Server verify connected client
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_accept_fd(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>int</tt> <var>fd</var>,&nbsp;<tt>char*</tt> <var>cn</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>fd</var>:</td><td> The connected file descriptor</td></tr>
+       <tr><td><var>cn</var>:</td><td> CN of the certificate to use for authentication</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error 
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_NOCRT</var>:</td><td> cert (cn) not loaded</td></tr>
+       <tr><td><var>EZS_ERR_BADCRT</var>:</td><td> cert invalid</td></tr>
+       <tr><td><var>EZS_ERR_BADKEY</var>:</td><td> key invalid</td></tr>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> accept failure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> On success the connection will be open and verified.
+
+       <li> You can find the peer's cn with <a href="#ezs_get_peer_cn">ezs_get_peer_cn</a>.
+
+       <li> If you choose not to retry a WOULDBLOCK error you must 
+   call <tt>ezs_disconnect</tt> to close the partially open connection.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_disconnect">&nbsp;ezs_disconnect</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Disconnect a connection
+
+
+
+
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>void</tt>&nbsp;ezs_disconnect(<tt>EZS*</tt>&nbsp;<i>E</i>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="Readingandwriting"> Reading and writing</div><p>
+
+
+Blocking reads and writes are 'semi-blocking'.  The library will wait 
+<i>timeout</i> seconds for the operation to complete.  Non-blocking
+reads and writes will return immediately.
+<p>
+Regardless of the blocking mode, a read or write may return
+one of the 'wouldblock' errors.
+<p>
+<ul>
+<li><i>EZS_ERR_READ_WOULDBLOCK</i>: a read operation could not complete
+<li><i>EZS_ERR_WRITE_WOULDBLOCK</i>: a write operation could not complete
+</ul>
+<p>
+Because an SSL connection can be renegotiated either of these 
+conditions may be returned for either a read or a write.
+You can use the <a href="#ezs_wouldblock">ezs_wouldblock</a> procedure to see if
+the IO operation failed for either reason.
+<p>
+Because the SSL library buffers incoming data,
+use the <a href="#ezs_bytes_for_read">ezs_bytes_for_read</a> procedure
+in addition to a <tt>select</tt> to see if there are bytes available
+for read.
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_read">&nbsp;ezs_read</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Read bytes from a peer
+
+     <i>len</i> bytes.
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_read(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char*</tt> <var>data</var>,&nbsp;<tt>int</tt> <var>len</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>data</var>:</td><td> Memory location to receive data.  Must be at least</td></tr>
+       <tr><td><var>len</var>:</td><td> maximum number of bytes to read</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> number of bytes read, 0 = error
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_NO_CONNECTION</var>:</td><td> no connection</td></tr>
+       <tr><td><var>EZS_ERR_READ_WOULDBLOCK</var>:</td><td> read blocked (waiting for read) </td></tr>
+       <tr><td><var>EZS_ERR_WRITE_WOULDBLOCK</var>:</td><td> read blocked (waiting for write)</td></tr>
+       <tr><td><var>EZS_ERR_READ_EOF</var>:</td><td> connection closed by peer</td></tr>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> SSL error</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> If you choose to retry a blocked read you must 
+   supply the exact same data with the retried <tt>ezs_read</tt>.
+   You may supply a copy of the original data however.
+
+       <li> If you choose not to retry a blocked read you must 
+   call <a href="#ezs_disconnect">ezs_disconnect</a> to close the open connection.
+
+       <li> You should call <a href="#ezs_disconnect">ezs_disconnect</a> to
+   close a connection after receiving an end-of-file.
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_write">&nbsp;ezs_write</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Write bytes to a peer
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_write(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char*</tt> <var>data</var>,&nbsp;<tt>int</tt> <var>len</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>data</var>:</td><td> Pointer to data. </td></tr>
+       <tr><td><var>len</var>:</td><td> number of bytes to write</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> number of bytes written, 0 = error
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_NO_CONNECTION</var>:</td><td> no connection</td></tr>
+       <tr><td><var>EZS_ERR_READ_WOULDBLOCK</var>:</td><td> write blocked (waiting for read) </td></tr>
+       <tr><td><var>EZS_ERR_WRITE_WOULDBLOCK</var>:</td><td> write blocked (waiting for write)</td></tr>
+       <tr><td><var>EZS_ERR_READ_EOF</var>:</td><td> connection closed by peer</td></tr>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> SSL error</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Success means all the data were written
+
+       <li> If you choose to retry a blocked write you must 
+   supply the exact same data with the retried <tt>ezs_write</tt>.
+   You may supply a copy of the original data however.
+
+       <li> If you choose not to retry a blocked write you must 
+   call <a href="#ezs_disconnect">ezs_disconnect</a> to close the open connection.
+
+       <li> You should call <a href="#ezs_disconnect">ezs_disconnect</a> to
+   close a connection after receiving an end-of-file.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_bytes_for_read">&nbsp;ezs_bytes_for_read</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td>  Get number of bytes available for read
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_bytes_for_read(<tt>EZS*</tt>&nbsp;<i>E</i>)&nbsp;</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> number of bytes buffered and available for a read operation
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_wouldblock">&nbsp;ezs_wouldblock</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td>  Test if the last IO attempt would have blocked
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_wouldblock(<tt>EZS*</tt>&nbsp;<i>E</i>)&nbsp;</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 if the last IO operation returned
+   EZS_ERR_READ_WOULDBLOCK or EZS_ERR_WRITE_WOULDBLOCK,
+  0 otherwise
+     
+
+
+
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="Encryptingdata"> Encrypting data </div><p>
+
+
+Some convenience routines are provided to encrypt and decrypt
+data and to compute MAC hashes. Encryption generally includes
+an <i>initialization vector</i> (IV) that ensures randomness in
+the start of a message.  The same, random IV must be used
+for both encryption and decryption.  
+<p>
+Keys are any binary strings, and should be at least 32 bytes long.
+
+<div class="proc-display">
+
+The default encryption cipher is 128 bit AES in CBC mode.
+<p>
+The default hash algorithm is SHA-1.
+<p>
+Use <tt>ezs_set_cipher</tt> and <tt>ezs_set_hash</tt> to select
+other algorithms.
+</div>
+
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_crypt_init">&nbsp;ezs_crypt_init</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Initialize cryption structures
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_crypt_init(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>char*</tt> <var>key</var>,&nbsp;<tt>int</tt> <var>len</var>,&nbsp;<tt>char**</tt> <var>iv</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>key</var>:</td><td> Encryption key</td></tr>
+       <tr><td><var>len</var>:</td><td> length of the key</td></tr>
+       <tr><td><var>iv</var>:</td><td> initialization vector</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> If <code>iv</code> is NULL an IV will be computed, used and discarded.
+      <br>If <code>iv</code> points to a NULL pointer an IV will be computed, used
+      and a pointer to it returned in <code>iv</code>.  If <code>iv</code> points
+      to a non-NULL pointer it is assumed to be a predefined IV and will
+      be used.
+
+
+       <li> The IV used in for encryption must be provided to the decryption step or
+    the first block of decrypted data will be lost.
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_crypt">&nbsp;ezs_crypt</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Encrypt or decrypt data
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_crypt(<tt>EZS*</tt>&nbsp;<i>E</i>,&nbsp;<tt>int</tt> <var>mode</var>,&nbsp;<tt>char*</tt> <var>out</var>,&nbsp;<tt>int</tt> <var>out_len</var>,&nbsp;<tt>char*</tt> <var>in</var>,&nbsp;<tt>int</tt> <var>in_len</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>E</var>:</td><td> An EZS structure</td></tr>
+       <tr><td><var>mode</var>:</td><td> Either EZS_ENCRYPT or EZS_DECRYPT</td></tr>
+       <tr><td><var>out</var>:</td><td> buffer to receive the crypted text</td></tr>
+       <tr><td><var>out_len</var>:</td><td> length of data stored in the buffer </td></tr>
+       <tr><td><var>in</var>:</td><td> data to encrypt or decrypt</td></tr>
+       <tr><td><var>in_len</var>:</td><td> length of data </td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1 = success, 0 = error
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+       <tr><td><var>EZS_ERR_SSL</var>:</td><td> cryption failure</td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Because of the possibility of block padding, the output
+   buffer's length should be at least <code><i>in_len</i> + EZS_BLOCKSIZE(<i>E</i>)</code>
+
+       <li> You must call <tt>ezs_crypt_init</tt> prior to <tt>ezs_crypt</tt>.
+
+
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_hmac">&nbsp;ezs_hmac</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Generate a MAC of some data
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_hmac(<tt>char**</tt> <var>mac</var>,&nbsp;<tt>int*</tt> <var>mac_len</var>,&nbsp;<tt>char*</tt> <var>data</var>,&nbsp;<tt>int</tt> <var>data_len</var>,&nbsp;<tt>char*</tt> <var>key</var>,&nbsp;<tt>int</tt> <var>key_len</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>data</var>:</td><td> data for which the MAC will be computed</td></tr>
+       <tr><td><var>data_len</var>:</td><td> length of data  </td></tr>
+       <tr><td><var>key</var>:</td><td> key for the MAC</td></tr>
+       <tr><td><var>key_len</var>:</td><td> length of the key  </td></tr>
+       <tr><td><var>mac</var>:</td><td> computed MAC</td></tr>
+       <tr><td><var>mac_len</var>:</td><td> length of mac  </td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1
+
+
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_data_to_base64">&nbsp;ezs_data_to_base64</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Convert binary data to printable base64
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_data_to_base64(<tt>char**</tt> <var>b64</var>,&nbsp;<tt>int*</tt> <var>b64_len</var>,&nbsp;<tt>char*</tt> <var>data</var>,&nbsp;<tt>int</tt> <var>data_len</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>data</var>:</td><td> input binary data</td></tr>
+       <tr><td><var>data_len</var>:</td><td> length of data  </td></tr>
+       <tr><td><var>b64</var>:</td><td> base64 representation of data</td></tr>
+       <tr><td><var>b64_len</var>:</td><td> length of b64 text  </td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1
+
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_base64_to_data">&nbsp;ezs_base64_to_data</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Convert base64 to binary data 
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_base64_to_data(<tt>char**</tt> <var>data</var>,&nbsp;<tt>int*</tt> <var>data_len</var>,&nbsp;<tt>char*</tt> <var>b64</var>,&nbsp;<tt>int</tt> <var>b64_len</var>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>b64</var>:</td><td> input base64 representation of data</td></tr>
+       <tr><td><var>b64_len</var>:</td><td> length of b64 text  </td></tr>
+       <tr><td><var>data</var>:</td><td> output binary data</td></tr>
+       <tr><td><var>data_len</var>:</td><td> length of data  </td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> 1
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_set_cipher">&nbsp;ezs_set_cipher</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Sets the cipher used by the encryption procedures
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_set_cipher(<tt>EVP_CIPHER*</tt>&nbsp;<tt>(*</tt><i>cipher</i><tt>)()</tt>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>cipher</var>:</td><td> any openssl cipher algorithm </td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Ciphers supported by your version of the openssl library
+   may be found in openssl's inlcude file <tt>evp.h</tt>.
+
+       <li> The default cipher is <tt>EVP_aes_128_cbc</tt> (128 bit AES in CBC mode)
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_set_hash">&nbsp;ezs_set_hash</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Sets the hash algorithm used by the encryption and hash procedures
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_set_hash(<tt>EVP_MD*</tt>&nbsp;<tt>(*</tt><i>hash</i><tt>)()</tt>)</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+       <tr><td><var>cipher</var>:</td><td> any openssl hash algorithm </td></tr>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td></td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Hashes supported by your version of the openssl library
+   may be found in openssl's inlcude file <tt>evp.h</tt>.
+
+       <li> The default is <tt>EVP_sha1</tt> (SHA-1)
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="Versioninformation"> Version information</div><p>
+<p>
+The EZS library will report both its own version and the
+versions of openssl it was compiled and linked with.
+The latter can help detect cases where the library is
+linked with different and incompatible versions 
+of openssl.
+<p>
+<p>
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="ezs_version">&nbsp;ezs_version</a></h2>
+ <table>
+  <tr><th valign=top align=right>Description:</th><td> Returns <tt>ezs</tt> and <tt>openssl</tt> version information.
+
+
+</td></tr>
+  <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>char</tt>&nbsp;*ezs_version()</td></tr>
+  <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Return:</th><td> Version information as a string.
+
+</td></tr>
+  <tr><th valign=top align=right>Errors:</th><td class="proc-args">
+     <table>
+
+
+     </table>
+     </td></tr>
+  <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
+     <ol>
+       <li> Caller is responsible for <i>free</i>ing the returned version string.
+
+
+
+
+
+     </ol>
+     </td></tr>
+  
+  </table>
+<p>
+
+
+</div>
+
+<p>
+
+
+
+
+<div class="proc-section-bar"><a name="License"> License</div><p>
+
+<code>
+<pre class=indent>
+ * =================================================================
+ * Copyright (c) 2006 The University of Washington
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =================================================================
+</pre>
+</code>
+
+</div>
+
+
+
+
+<div class="proc-section-bar"><a name="Examples"> Examples
+</div><p>
+
+
+<p>
+<div class="proc">
+ <h2><a name="Client">&nbsp;Client</a></h2>
+  
+
+Basic client connect and read loop
+
+<div class="proc-display">
+
+<pre>
+<code>
+
+ #include "ezs.h"
+
+ static char *hw = "Hello, world.";
+
+main()
+{
+   EZS *E;
+   char *mycn;
+   int r;
+   char resp[4096];
+
+   /* allocate an ezs struct */
+   E = ezs_new(NULL);
+
+   /* add the CA info */
+   if (!ezs_add_ca(<i>CA's certificate file</i>)) {
+      fprintf(stderr, "set ca: %d\n", ezs_errno(E));
+      exit (1);
+   }
+
+   /* add our cert */
+   if (!ezs_add_cert(<i>my cert and key file</i>, NULL, &mycn)) {
+      fprintf(stderr, "set cert: %d\n", ezs_errno(E));
+      exit (1);
+   }
+
+   /* connect to server */
+   if (!ezs_connect(E, <i>server host:port</i>, mycn)) {
+      fprintf(stderr,">> Connect error, err = %d\n",
+              ezs_errno(E));
+      exit (1);
+   }
+
+   /* send message */
+
+   if ((r=ezs_write(E, hw, strlen(hw)<0) {
+       fprintf(stderr, ">> write failed, %d\n",
+              ezs_errno(E));
+       exit (1);
+   }
+
+   /* read reply */
+
+   if ((r=ezs_read(E, resp, 4095))<=0) {
+      fprintf(stderr, ">> read failed, %d\n",
+              ezs_errno(E));
+      exit (1);
+   }
+
+   resp[r] = '\0';
+   printf("Received: %s\n", resp);
+
+   ezs_disconnect(E);
+
+}
+
+</code>
+</pre>
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+<p>
+<div class="proc">
+ <h2><a name="Crypto">&nbsp;Crypto</a></h2>
+  
+
+Encrypt and compute a MAC
+
+<div class="proc-display">
+
+<pre>
+<code>
+
+ #include "ezs.h"
+
+ static char *hw = "Hello, world.";
+ static key = "my key string";
+
+ #define UC (unsigned char*)
+
+main()
+{
+   EZS *E;
+   unsigned char *e_hw;
+   int e_len;
+   unsigned char *mac;
+   int mac_len;
+   unsigned char *iv = NULL;
+   char *mac64, *e64;
+
+   /* alloc an ezs struct */
+   ezs_init(NULL);
+   E = ezs_new(NULL);
+   
+   /* Initialize */
+   ezs_crypt_init(E, key, strlen(key), &iv);
+
+   /* encrypt */
+   e_hw = UC malloc(strlen(hw)+EZS_BLOCKSIZE(E));
+   
+   ezs_crypt(E, EZS_ENCRYPT, e_hw, &e_len, UC hw, strlen(hw));
+
+   /* get mac */
+   ezs_hmac(&mac, &mac_len, e_hw, e_len, UC key, strlen(key));
+
+   ezs_data_to_base64(&mac64, NULL, (void*)mac, mac_len);
+   ezs_data_to_base64(&e64, NULL, (void*)e_hw, e_len);
+
+   printf("%s encoded = %s\n", hw, e64);
+   printf("mac = %s\n", mac64);
+}
+  
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+<div class="floating-index">
+<h3>Procedures</h3>
+<ul id="toc">
+<li><a href="#ezs_accept">ezs_accept</a></li>
+<li><a href="#ezs_accept_fd">ezs_accept_fd</a></li>
+<li><a href="#ezs_add_ca">ezs_add_ca</a></li>
+<li><a href="#ezs_add_cert">ezs_add_cert</a></li>
+<li><a href="#ezs_add_crl">ezs_add_crl</a></li>
+<li><a href="#ezs_allow_v2">ezs_allow_v2</a></li>
+<li><a href="#ezs_allow_v3">ezs_allow_v3</a></li>
+<li><a href="#ezs_base64_to_data">ezs_base64_to_data</a></li>
+<li><a href="#ezs_bytes_for_read">ezs_bytes_for_read</a></li>
+<li><a href="#ezs_connect">ezs_connect</a></li>
+<li><a href="#ezs_connect_fd">ezs_connect_fd</a></li>
+<li><a href="#ezs_crypt">ezs_crypt</a></li>
+<li><a href="#ezs_crypt_init">ezs_crypt_init</a></li>
+<li><a href="#ezs_data_to_base64">ezs_data_to_base64</a></li>
+<li><a href="#ezs_deny_v2">ezs_deny_v2</a></li>
+<li><a href="#ezs_deny_v3">ezs_deny_v3</a></li>
+<li><a href="#ezs_disconnect">ezs_disconnect</a></li>
+<li><a href="#ezs_errno">ezs_errno</a></li>
+<li><a href="#ezs_free">ezs_free</a></li>
+<li><a href="#ezs_get_peer_cn">ezs_get_peer_cn</a></li>
+<li><a href="#ezs_get_session">ezs_get_session</a></li>
+<li><a href="#ezs_geterror">ezs_geterror</a></li>
+<li><a href="#ezs_hmac">ezs_hmac</a></li>
+<li><a href="#ezs_init">ezs_init</a></li>
+<li><a href="#ezs_listen">ezs_listen</a></li>
+<li><a href="#ezs_load_rand_file">ezs_load_rand_file</a></li>
+<li><a href="#ezs_new">ezs_new</a></li>
+<li><a href="#ezs_read">ezs_read</a></li>
+<li><a href="#ezs_save_rand_file">ezs_save_rand_file</a></li>
+<li><a href="#ezs_set_cipher">ezs_set_cipher</a></li>
+<li><a href="#ezs_set_hash">ezs_set_hash</a></li>
+<li><a href="#ezs_set_session">ezs_set_session</a></li>
+<li><a href="#ezs_set_session_name">ezs_set_session_name</a></li>
+<li><a href="#ezs_set_timeout">ezs_set_timeout</a></li>
+<li><a href="#ezs_set_verify">ezs_set_verify</a></li>
+<li><a href="#ezs_use_blocking_io">ezs_use_blocking_io</a></li>
+<li><a href="#ezs_use_nonblocking_io">ezs_use_nonblocking_io</a></li>
+<li><a href="#ezs_version">ezs_version</a></li>
+<li><a href="#ezs_wouldblock">ezs_wouldblock</a></li>
+<li><a href="#ezs_write">ezs_write</a></li>
+
+</ul>
+<p>
+<h3>Examples</h3>
+<ul id="toc">
+<li><a href="#Client">Client</a></li>
+<li><a href="#Crypto">Crypto</a></li>
+
+</ul>
+
+</div>
+
+</div>
+
+
+</body>
+</html>
+
