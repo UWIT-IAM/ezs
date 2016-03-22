@@ -11,5 +11,5 @@ include_HEADERS=ezs.h ezsthread.h
 SUBDIRS = . example test
 DIST_SUBDIRS = $(SUBDIRS)
 
-EXTRA_DIST= COPYRIGHT README CHANGES doc/ezs.html
+EXTRA_DIST= COPYRIGHT README.md CHANGES doc/ezs.html
 

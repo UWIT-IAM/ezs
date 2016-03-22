@@ -39,10 +39,11 @@
 Provides an easy-to-use, SSL protected connection library.
 
 </td></tr>
-<tr><th align=left valign=top>Version:</th><td align=left> 1.4.1
+<tr><th align=left valign=top>Version:</th><td align=left> 1.4.2
 
 </td></tr>
-<tr><th align=left valign=top>Download:</th><td align=left> <a href="ezs-1.4.1.tar.gz">ezs-1.4.1.tar.gz</a>
+<tr><th align=left valign=top>Download:</th><td align=left> <a href="ezs-1.4.2.tar.gz">ezs-1.4.2.tar.gz</a>
+<tr><th align=left valign=top>Git:</th><td align=left><a href="https://github.com/UWIT-IAM/ezs.git">https://github.com/UWIT-IAM/ezs.git</a>
 </td></tr>
 </table>
 </div>
@@ -613,13 +614,13 @@ to add to your list of CRLs.
 <div class="proc">
  <h2><a name="ezs_add_ca">&nbsp;ezs_add_ca</a></h2>
  <table>
-  <tr><th valign=top align=right>Description:</th><td> Add a CA to your list of acceptable CAs.
+  <tr><th valign=top align=right>Description:</th><td> Add one or more CAs to your list of acceptable CAs.
 
 </td></tr>
   <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_add_ca(<tt>char*</tt> <var>ca_file</var>)</td></tr>
   <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
      <table>
-       <tr><td><var>ca_file</var>:</td><td> Contains CA certificate to add</td></tr>
+       <tr><td><var>ca_file</var>:</td><td> Contains the CA certificates to add (PEM)</td></tr>
 
 
      </table>
@@ -637,7 +638,7 @@ to add to your list of CRLs.
      </td></tr>
   <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
      <ol>
-       <li>  The certificate 
+       <li>  The certificates
   will be added to the list of acceptable signers 
   of peer certificates.
 
@@ -645,12 +646,6 @@ to add to your list of CRLs.
 
        <li> If the file also contains a CRL entry it will 
    automatically be added to the CRL list.
-
-       <li> If the file contains multiple certificates only the
-   first is loaded.
-
-
-
 
      </ol>
      </td></tr>

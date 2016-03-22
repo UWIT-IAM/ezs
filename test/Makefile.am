@@ -1,6 +1,6 @@
 ## EZS library tests
 
-noinst_PROGRAMS=server1 client1 crypt1 test
+noinst_PROGRAMS=server1 server2 client1 crypt1 test
 .PHONY:	test
 nodist_test_SOURCES = test
 AM_CPPFLAGS = -I..
