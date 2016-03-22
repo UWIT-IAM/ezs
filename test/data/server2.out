@@ -1,0 +1,19 @@
+mycert cn=localhost
+doing ezs_accept_fd on 4
+client_thread
+client_writer
+.. read, ezs error 10 Read end of file
+doing ezs_accept_fd on 5
+client_thread
+client_writer
+Accepting connections, port '98766'.
+Client accept from localhost
+[0] recv 26 bytes: Hello, world. First time.
+
+[0] recv 15 bytes: Goodbye world.
+
+Client accept from localhost
+[1] recv 27 bytes: Hello, world. Second time.
+
+[1] recv 5 bytes: exit
+

@@ -1,0 +1,9 @@
+mycert cn=localhost
+server_reader
+saving session
+stdin: Success
+using recovered session
+mycert cn=localhost
+server_reader
+saving session
+stdin: Success

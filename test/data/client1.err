@@ -2,6 +2,9 @@ mycert cn=localhost
 .. Connect, ezs error 1 SSL error
 error:14090086:SSL routines:SSL3_GET_SERVER_CERTIFICATE:certificate verify failed
 mycert cn=localhost
+.. Connect, ezs error 1 SSL error
+error:14090086:SSL routines:SSL3_GET_SERVER_CERTIFICATE:certificate verify failed
+mycert cn=localhost
 server_reader
 saving session
 stdin: Success

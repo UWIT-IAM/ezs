@@ -1,2 +1,3 @@
 V	21160221220736Z		01	unknown	/C=US/ST=Washington/L=Seattle/O=University of Washington/CN=localhost
 V	21160221220821Z		02	unknown	/C=US/ST=Washington/L=Seattle/O=University of Washington/CN=localhost
+R	21160227220110Z	160322220341Z	03	unknown	/C=US/ST=Washington/L=Seattle/O=University of Washington/CN=localhost

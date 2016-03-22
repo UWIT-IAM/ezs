@@ -22,3 +22,16 @@ In addition,
 
   extra CA certs were added to the ca.crt file
   uwca.crt added 
+
+
+# revoked cert: client-r.crt
+openssl req -config req.cnf -newkey rsa:2048 -sha256 -nodes -out client-r.req -outform PEM -keyout client-r.key
+openssl ca -config ca.cnf -policy signing_policy -extensions signing_req -out client-r.crt -infiles client-r.req
+openssl ca  -config ca.cnf  -revoke client-r.crt
+
+
+cabundle.crt: bundle of misc certs, test ca, and test crl
+
+
+
+
