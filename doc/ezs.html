@@ -644,7 +644,7 @@ to add to your list of CRLs.
 
        <li> Must be PEM format
 
-       <li> If the file also contains a CRL entry it will 
+       <li> If the file also contains CRLs they will 
    automatically be added to the CRL list.
 
      </ol>
@@ -667,13 +667,13 @@ to add to your list of CRLs.
 <div class="proc">
  <h2><a name="ezs_add_crl">&nbsp;ezs_add_crl</a></h2>
  <table>
-  <tr><th valign=top align=right>Description:</th><td> Add a CRL to your list of CRLs. 
+  <tr><th valign=top align=right>Description:</th><td> Adds one or more CRLs to your list of CRLs. 
 
 </td></tr>
   <tr><th valign=top align=right>Syntax:</th><td>&nbsp;&nbsp;&nbsp;<tt>int</tt>&nbsp;ezs_add_crl(<tt>char*</tt> <var>crl_file</var>)</td></tr>
   <tr><th valign=top align=right>Arguments:</th><td class="proc-args">
      <table>
-       <tr><td><var>crl_file</var>:</td><td> Contains the CRL to add</td></tr>
+       <tr><td><var>crl_file</var>:</td><td> Contains the CRLs to add</td></tr>
 
 
      </table>
@@ -691,17 +691,14 @@ to add to your list of CRLs.
      </td></tr>
   <tr><th valign=top align=right>Notes:</th><td class="proc-notes">
      <ol>
-       <li> The CRL will be added to the list of CRLs used to verify certificates.
+       <li> The CRLs will be added to the list of CRLs used to verify certificates.
 
        <li> Must be PEM format
 
        <li> You can use <tt>ezs_add_crl</tt> at any time
-   to load a new CRL or to refresh an existing CRL.
+   to load new CRLs or to refresh existing CRLs.
    Changes will take effect on the next connect or accept.
    Existing connections will be unaffected.
-
-       <li> If the file contains multiple CRLs only the
-   first is loaded.
 
 
 

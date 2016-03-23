@@ -2,7 +2,7 @@
 #
 # ezs tests
 
-result=0
+ret=0
 
 # basic encrypt / decrypt
 echo "==== crypt test"
