@@ -1,7 +1,7 @@
 ## EZS library examples
 
 noinst_PROGRAMS=client1 server1 crypt1 client2 client3 server2 server3
-INCLUDES = -I..
+AM_CPPFLAGS = -I..
 
 # these seem to work on my linux and aix
 AM_LDFLAGS= -L../.libs -L/usr/local/lib -lezs -lssl -lcrypto -lpthread -ldl

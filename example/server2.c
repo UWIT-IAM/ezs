@@ -336,7 +336,7 @@ static char *chkhost(struct sockaddr_in *f)
 }
 
 
-main(argc,argv)
+int main(argc,argv)
 int  argc;
 char **argv;
 {

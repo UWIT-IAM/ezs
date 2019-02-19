@@ -73,12 +73,6 @@ static char *randfile = NULL;
 static int need_init = 1;
 #define EZS_INIT {if (need_init) ezs_init(NULL);}
 const char *EZS_version_str = PACKAGE_STRING;
-#ifdef HAVE_LIBSSL_VERSION
-extern const char *SSL_version_str;
-#else
-const char *SSL_version_str = "unavailable";
-#endif
-
 
 
 /* ---------- internal procedures ------------------ */
@@ -792,9 +786,9 @@ int ezs_init(char *name)
 
 char *ezs_version()
 {
-   size_t l = strlen(EZS_VERSION_STRING) + strlen(OPENSSL_VERSION_TEXT) + strlen(SSL_version_str) + 64;
+   size_t l = strlen(EZS_VERSION_STRING) + strlen(OPENSSL_VERSION_TEXT) + 64;
    char *v = (char*) malloc(l);
-   sprintf(v, "%s (Openssl: incl=[%s], link=[%s])", EZS_VERSION_STRING, OPENSSL_VERSION_TEXT, SSL_version_str);
+   sprintf(v, "%s (Openssl: %s)", EZS_VERSION_STRING, OPENSSL_VERSION_TEXT);
    return (v);
 }
 

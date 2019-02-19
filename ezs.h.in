@@ -20,9 +20,10 @@
 
 /* Definitions from configure. */
 
-#define EZS_NAME "ezs"
-#define EZS_VERSION_STRING "ezs 1.4.2"
-#define EZS_VERSION "1.4.2"
+#define EZS_NAME "@PACKAGE_NAME@"
+#define EZS_VERSION_STRING "@PACKAGE_STRING@"
+#define EZS_VERSION "@PACKAGE_VERSION@"
+
 
 /* end of configure generated data */
 
@@ -41,6 +42,7 @@
 #include <time.h>
 
 #include <string.h>
+#include <ctype.h>
 
 #include <openssl/bio.h>
 #include <openssl/err.h>

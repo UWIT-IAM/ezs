@@ -1,3 +1,4 @@
 1.4.0:  optionally deny use of SSLv3
 1.4.2:  Allow multiple certs in ca files
+1.4.3:  Code cleanup.  Simplify (fix) ezs_version()
 

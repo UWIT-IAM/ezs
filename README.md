@@ -4,6 +4,9 @@ Simplifies SSL communications for c programs
 
 See 'doc' for reference
 
-./configure, make, make install to install
+. ./boot
+./configure
+make
+make install
 
 

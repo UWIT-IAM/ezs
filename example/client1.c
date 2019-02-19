@@ -107,7 +107,7 @@ THREAD_PROC server_thread(void *arg)
 }
 
 
-main(argc,argv)
+int main(argc,argv)
 int  argc;
 char **argv;
 {

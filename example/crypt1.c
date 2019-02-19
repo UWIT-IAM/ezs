@@ -42,7 +42,7 @@ static char *pnbytes(unsigned char *byt, int n)
 }
 
 
-main()
+int main()
 {
     char *p_in, *p_out;
     unsigned char *e;
@@ -55,6 +55,8 @@ main()
     int macl;
     char *mac64;
     int mac64l;
+
+    printf("ezs lib version: %s\n", ezs_version());
 
     /* ezs_debug = 99; */
     EZS *E = ezs_new();

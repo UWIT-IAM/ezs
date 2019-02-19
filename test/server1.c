@@ -297,7 +297,7 @@ THREAD_PROC user_thread(void *arg)
   exit (1);
 }
 
-main(argc,argv)
+int main(argc,argv)
 int  argc;
 char **argv;
 {

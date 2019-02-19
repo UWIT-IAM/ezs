@@ -47,7 +47,7 @@ int usage(char *a0) {
     exit (1);
 }
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *p_in, *p_out;
     unsigned char *e;

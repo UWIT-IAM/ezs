@@ -73,7 +73,7 @@ void fatal_err(EZS *E, char *msg)
 }
 
 
-main(argc,argv)
+int main(argc,argv)
 int  argc;
 char **argv;
 {
