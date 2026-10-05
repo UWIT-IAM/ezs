@@ -61,8 +61,9 @@ extern int ezs_debug;   /* set nonzero for debug to stderr */
 typedef struct EZSCert_ {
   struct EZSCert_ *next;
   char *cn;
-  X509 *x;
-  EVP_PKEY *k;
+  X509 *x;               /* server/leaf certificate */
+  STACK_OF(X509) *chain; /* intermediate certificates */
+  EVP_PKEY *k;           /* private key */
 } EZSCert;
 
 typedef struct EZSCrl_ {

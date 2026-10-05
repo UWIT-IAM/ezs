@@ -345,27 +345,43 @@ static int set_ssl_cert(EZS *E, char *cn)
 {
    EZSCert *c = ezs_find_cert(cn);
    int r;
+   int i;
 
    if (!c) {
       E->ezs_errno = EZS_ERR_NOCRT;
       return (0);
    }
+
    if (!E->ssl) {
       E->ezs_errno = EZS_ERR_NO_CONNECTION;
       return (0);
    }
- 
-   if ((r=SSL_use_certificate(E->ssl, c->x)) != 1) {
+
+   if (SSL_use_certificate(E->ssl, c->x) != 1) {
       E->ezs_errno = EZS_ERR_BADCRT;
       return (0);
    }
-   if ((r=SSL_use_PrivateKey(E->ssl, c->k)) != 1) {
+
+   if (SSL_use_PrivateKey(E->ssl, c->k) != 1) {
       E->ezs_errno = EZS_ERR_BADKEY;
       return (0);
    }
+
+   /*
+    * SSL_add1_chain_cert() increments the X509 reference count,
+    * so the certificates remain owned by EZSCert as well.
+    */
+   for (i = 0; i < sk_X509_num(c->chain); i++) {
+      X509 *chain_cert = sk_X509_value(c->chain, i);
+
+      if (SSL_add1_chain_cert(E->ssl, chain_cert) != 1) {
+         E->ezs_errno = EZS_ERR_BADCRT;
+         return (0);
+      }
+   }
+
    return (1);
 }
-
 
 /* Establish an SSL connection using an existing BIO.
    Return: 1 on OK
@@ -840,41 +856,99 @@ void ezs_set_session_name(char *name)
 
 int ezs_add_ca(char *cafile)
 {
-   X509 *x;
-   FILE *fp;
-   EZSCert *ca;
+   X509 *x = NULL;
+   X509 *chain_cert = NULL;
+   EVP_PKEY *k = NULL;
+   FILE *fp1 = NULL;
+   FILE *fp2 = NULL;
+   EZSCert *ce = NULL;
 
    EZS_INIT;
 
-   if (!(fp=fopen(cafile, "r"))) {
+   fp1 = fopen(crtfile, "r");
+   if (!fp1) {
       ezs_global_errno = 0 - errno;
       return (0);
    }
 
-   while ((x = PEM_read_X509(fp, NULL, NULL, NULL)) != NULL) {
-      ca = (EZSCert*) MALLOC(sizeof(EZSCert));
-      ca->x = x;
-      ca->k = NULL;
-      ca->cn = get_cn_from_cert(x);
-      FPRINTF(DEBUG_FP, " .. adding ca %s\n", ca->cn);
-
-      MUTEX_LOCK(ezs_ctx_lock);
-      ca->next = ezs_ca_list;
-      ezs_ca_list = ca;
-      /* additions to ca list require new context */
-      if (ezs_ctx && ezs_ctx->ref_count<=0) free_ezs_ctx(ezs_ctx);
-      ezs_ctx = NULL;
-      MUTEX_UNLOCK(ezs_ctx_lock);
-   }
-
-   fclose(fp);
-   if (!ezs_ca_list) {
+   fp2 = fopen(keyfile ? keyfile : crtfile, "r");
+   if (!fp2) {
+      fclose(fp1);
       ezs_global_errno = EZS_ERR_SSL;
       return (0);
    }
 
-   /* also add any crl info in the ca file */
-   ezs_add_crl(cafile);
+   /*
+    * The first certificate is the server certificate.
+    */
+   x = PEM_read_X509(fp1, NULL, NULL, NULL);
+   if (!x) {
+      fclose(fp1);
+      fclose(fp2);
+      ezs_global_errno = EZS_ERR_SSL;
+      return (0);
+   }
+
+   /*
+    * Read exactly one private key. The remaining certificates in
+    * crtfile are intermediate certificates, not additional key pairs.
+    */
+   k = PEM_read_PrivateKey(fp2, NULL, NULL, NULL);
+   if (!k) {
+      X509_free(x);
+      fclose(fp1);
+      fclose(fp2);
+      ezs_global_errno = EZS_ERR_SSL;
+      return (0);
+   }
+
+   ce = (EZSCert *)MALLOC(sizeof(EZSCert));
+   memset(ce, 0, sizeof(EZSCert));
+
+   ce->x = x;
+   ce->k = k;
+   ce->cn = get_cn_from_cert(x);
+   ce->chain = sk_X509_new_null();
+
+   if (!ce->chain) {
+      X509_free(x);
+      EVP_PKEY_free(k);
+      FREE(ce);
+      fclose(fp1);
+      fclose(fp2);
+      ezs_global_errno = EZS_ERR_SSL;
+      return (0);
+   }
+
+   /*
+    * All remaining certificates are intermediate certificates.
+    */
+   while ((chain_cert = PEM_read_X509(fp1, NULL, NULL, NULL)) != NULL) {
+      if (!sk_X509_push(ce->chain, chain_cert)) {
+         X509_free(chain_cert);
+         sk_X509_pop_free(ce->chain, X509_free);
+         X509_free(ce->x);
+         EVP_PKEY_free(ce->k);
+         FREE(ce->cn);
+         FREE(ce);
+         fclose(fp1);
+         fclose(fp2);
+         ezs_global_errno = EZS_ERR_SSL;
+         return (0);
+      }
+   }
+
+   if (cn && !*cn)
+      *cn = STRDUP(ce->cn);
+
+   MUTEX_LOCK(ezs_ctx_lock);
+   ce->next = ezs_cert_list;
+   ezs_cert_list = ce;
+   MUTEX_UNLOCK(ezs_ctx_lock);
+
+   fclose(fp1);
+   fclose(fp2);
+
    return (1);
 }
 
