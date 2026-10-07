@@ -1,5 +1,5 @@
 /* ========================================================================
- * Copyright (c) 2006-2014 The University of Washington
+ * Copyright (c) 2006-2007 The University of Washington
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ static char *randfile = NULL;
 
 static int need_init = 1;
 #define EZS_INIT {if (need_init) ezs_init(NULL);}
+
 const char *EZS_version_str = PACKAGE_STRING;
 
 
@@ -173,8 +174,10 @@ static EZSCtx *ezs_ctx_new(int flags)
           /* return (NULL); */
        }
    }
-   if (ezs_crl_list) X509_STORE_set_flags(store, X509_V_FLAG_CRL_CHECK);
  
+   /* tell openssl to use the crl list */
+   if (ezs_crl_list) X509_STORE_set_flags(store, X509_V_FLAG_CRL_CHECK);
+
    /* server session name */
    if (session_name) SSL_CTX_set_session_id_context(ctx->ssl_ctx, session_name, (int)strlen((char*)session_name));
    else SSL_CTX_ctrl(ctx->ssl_ctx, SSL_CTRL_SET_SESS_CACHE_MODE, SSL_SESS_CACHE_OFF, NULL);
@@ -289,7 +292,6 @@ static int check_peer(EZS *E)
       E->peer_cn = STRDUP("anonymous");
       return(1);
    }
-
    cn[0] = 0;
    X509_NAME_get_text_by_NID (X509_get_subject_name(peercert), NID_commonName, cn, 256);
 
@@ -332,35 +334,35 @@ static char *get_cn_from_cert(X509 *x)
 {
    char cn[256];
    int r;
+
    r = X509_NAME_get_text_by_NID (X509_get_subject_name(x), NID_commonName, cn, 256);
    return (STRDUP(r != -1 ? cn : "-N/A-"));
 }
 
 
-
 /* Set the cert to use for authentication.
    Return 1 if OK */
 
-static int set_ssl_cert(EZS *E, char *cn)
+static int set_ssl_cert(EZS *E, char *cn, int f)
 {
    EZSCert *c = ezs_find_cert(cn);
    int r;
 
-   if (!c) {
-      E->ezs_errno = EZS_ERR_NOCRT;
-      return (0);
-   }
    if (!E->ssl) {
       E->ezs_errno = EZS_ERR_NO_CONNECTION;
       return (0);
    }
- 
-   if ((r=SSL_use_certificate(E->ssl, c->x)) != 1) {
-      E->ezs_errno = EZS_ERR_BADCRT;
-      return (0);
-   }
-   if ((r=SSL_use_PrivateKey(E->ssl, c->k)) != 1) {
-      E->ezs_errno = EZS_ERR_BADKEY;
+   if (c) {
+      if ((r=SSL_use_certificate(E->ssl, c->x)) != 1) {
+         E->ezs_errno = EZS_ERR_BADCRT;
+         return (0);
+      }
+      if ((r=SSL_use_PrivateKey(E->ssl, c->k)) != 1) {
+         E->ezs_errno = EZS_ERR_BADKEY;
+         return (0);
+      }
+   } else if (f) {
+      E->ezs_errno = EZS_ERR_NOCRT;
       return (0);
    }
    return (1);
@@ -408,7 +410,7 @@ static int connect_bio(EZS *E, char *cn)
       if (E->cipher_list) SSL_set_cipher_list(E->ssl, E->cipher_list);
       SSL_set_bio(E->ssl, E->conn, E->conn);
 
-      if (!set_ssl_cert(E, cn)) return (0);
+      if (!set_ssl_cert(E, cn, 0)) return (0);
 
       if (E->session) {
          FPRINTF(DEBUG_FP, "using saved session\n");
@@ -566,10 +568,11 @@ static int accept_bio(EZS *E, char *cn)
       SSL_set_bio(E->ssl, E->conn, E->conn);
       SSL_set_accept_state(E->ssl);
 
-      if (!set_ssl_cert(E, cn)) {
+      if (!set_ssl_cert(E, cn, 1)) {
          E->ezs_errno = EZS_ERR_SSL;
          return (0);
       }
+
       if (!E->allow_v2) SSL_set_options(E->ssl, SSL_OP_NO_SSLv2);
       if (!E->allow_v3) SSL_set_options(E->ssl, SSL_OP_NO_SSLv3);
 
@@ -700,6 +703,7 @@ EZSCert *ezs_find_cert(char *cn)
    return (NULL);
 }
 
+
 #define EZSERRL 2048
 int ezs_geterror(EZS *E, char **errtxtret) 
 {
@@ -786,9 +790,9 @@ int ezs_init(char *name)
 
 char *ezs_version()
 {
-   size_t l = strlen(EZS_VERSION_STRING) + strlen(OPENSSL_VERSION_TEXT) + 64;
+   size_t l = strlen(EZS_VERSION_STRING) + strlen(OPENSSL_VERSION_TEXT) + strlen(SSL_version) + 64;
    char *v = (char*) malloc(l);
-   sprintf(v, "%s (Openssl: %s)", EZS_VERSION_STRING, OPENSSL_VERSION_TEXT);
+   sprintf(v, "%s (Openssl: incl=[%s], link=[%s])", EZS_VERSION_STRING, OPENSSL_VERSION_TEXT, SSL_version);
    return (v);
 }
 
@@ -804,7 +808,6 @@ EZS *ezs_new()
    memset (E, '\0', sizeof(EZS));
    E->requir_peer_cn = 1;
    E->timeout = EZS_DEFAULT_TIMEOUT;
-   E->allow_v3 = 1;  // default - due to history
    return (E);
 }
 
@@ -814,7 +817,7 @@ void ezs_free(EZS *E)
 {
    if (!E) return;
 
-   do_shutdown(E);
+// do_shutdown(E);
    if (E->session) SSL_SESSION_free(E->session);
    FREE(E->peer_cn);
    FREE(E->peer_hn);
@@ -872,7 +875,6 @@ int ezs_add_ca(char *cafile)
       ezs_global_errno = EZS_ERR_SSL;
       return (0);
    }
-
    /* also add any crl info in the ca file */
    ezs_add_crl(cafile);
    return (1);
@@ -893,6 +895,7 @@ int ezs_add_crl(char *crlfile)
       ezs_global_errno = 0 - errno;
       return (0);
    }
+
    while ((x = PEM_read_X509_CRL(fp, NULL, NULL, NULL)) != NULL) {
       crl = (EZSCrl*) MALLOC(sizeof(EZSCrl));
       crl->x = x;
@@ -911,20 +914,20 @@ int ezs_add_crl(char *crlfile)
             FREE(c);
             break;
          }
-       }
+      }
       crl->next = ezs_crl_list;
       ezs_crl_list = crl;
       /* changes to crl list require new context */
       if (ezs_ctx && ezs_ctx->ref_count<=0) free_ezs_ctx(ezs_ctx);
       ezs_ctx = NULL;
       MUTEX_UNLOCK(ezs_ctx_lock);
-    }
+   }
+
    fclose(fp);
    if (!ezs_crl_list) {
       ezs_global_errno = EZS_ERR_SSL;
       return (0);
    }
-
    return (1);
 }
 
@@ -1091,7 +1094,6 @@ int ezs_listen(EZS *E, char *port)
       E->ezs_errno = EZS_ERR_SSL;
       return (0);
    }
-   BIO_set_bind_mode(E->conn, BIO_BIND_REUSEADDR);
 
    if (BIO_do_accept(E->conn)<=0) {
       BIO_free_all(E->conn);
@@ -1121,7 +1123,6 @@ EZS *ezs_accept(EZS *A, char *cn)
       return (E);
    }
  
-   BIO_set_bind_mode(E->conn, BIO_BIND_REUSEADDR);
    E->conn = BIO_pop(A->conn);
 
    accept_bio(E, cn);
@@ -1300,7 +1301,7 @@ int ezs_read(EZS *E, char *buf, int len)
 
    /* Can't do read if write waiting */
    if (E->write_waiton_read) {
-       FPRINTF(DEBUG_FP,"read postponed: write waiting\n");
+       FPRINTF(DEBUG_FP,"read postponed: write waiting %d\n", len);
        E->ezs_errno = EZS_ERR_READ_WOULDBLOCK;
        return (0);
    }

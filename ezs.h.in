@@ -24,7 +24,6 @@
 #define EZS_VERSION_STRING "@PACKAGE_STRING@"
 #define EZS_VERSION "@PACKAGE_VERSION@"
 
-
 /* end of configure generated data */
 
 
@@ -42,7 +41,6 @@
 #include <time.h>
 
 #include <string.h>
-#include <ctype.h>
 
 #include <openssl/bio.h>
 #include <openssl/err.h>
@@ -165,8 +163,6 @@ char *ezs_err_txt[] = {
 #define ezs_use_blocking_io(E) (E->nonblocking=0)
 #define ezs_allow_v2(E) (E->allow_v2=1)
 #define ezs_allow_v3(E) (E->allow_v3=1)
-#define ezs_deny_v2(E) (E->allow_v2=0)
-#define ezs_deny_v3(E) (E->allow_v3=0)
 #define ezs_load_rand_file(f) RAND_load_file(f,-1);
 #define ezs_save_rand_file(f) RAND_write_file(f);
 

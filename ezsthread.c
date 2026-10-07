@@ -53,15 +53,15 @@ static void dyn_destroy_function(struct CRYPTO_dynlock_value *l,
 int ezs_THREAD_setup(void)
 {
   int i;
-  mutex_buf = (MUTEX_T *)malloc(CRYPTO_num_locks() * sizeof(MUTEX_T));
-  if (!mutex_buf) return 0;
-  /* this should not be necessary */
-  memset(mutex_buf, '\0', CRYPTO_num_locks()*sizeof(MUTEX_T));
-  for (i = 0; i < CRYPTO_num_locks( ); i++) MUTEX_SETUP(mutex_buf[i]);
+  mutex_buf = (MUTEX_T *)malloc(CRYPTO_num_locks( ) * sizeof(MUTEX_T));
+  if (!mutex_buf)
+    return 0;
+  for (i = 0; i < CRYPTO_num_locks( ); i++)
+    MUTEX_SETUP(mutex_buf[i]);
   CRYPTO_set_id_callback(id_function);
   CRYPTO_set_locking_callback(locking_function);
-  /* The following three CRYPTO_... functions are the OpenSSL functions
-     for registering the callbacks we implemented above */
+    /* The following three CRYPTO_... functions are the OpenSSL functions
+       for registering the callbacks we implemented above */
   CRYPTO_set_dynlock_create_callback(dyn_create_function);
   CRYPTO_set_dynlock_lock_callback(dyn_lock_function);
   CRYPTO_set_dynlock_destroy_callback(dyn_destroy_function);
@@ -71,13 +71,15 @@ int ezs_THREAD_setup(void)
 int ezs_THREAD_cleanup(void)
 {
   int i;
-  if (!mutex_buf) return 0;
+  if (!mutex_buf)
+    return 0;
   CRYPTO_set_id_callback(NULL);
   CRYPTO_set_locking_callback(NULL);
   CRYPTO_set_dynlock_create_callback(NULL);
   CRYPTO_set_dynlock_lock_callback(NULL);
   CRYPTO_set_dynlock_destroy_callback(NULL);
-  for (i = 0; i < CRYPTO_num_locks( ); i++) MUTEX_CLEANUP(mutex_buf[i]);
+  for (i = 0; i < CRYPTO_num_locks( ); i++)
+    MUTEX_CLEANUP(mutex_buf[i]);
   free(mutex_buf);
   mutex_buf = NULL;
   return 1;
